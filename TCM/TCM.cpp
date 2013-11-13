@@ -14,7 +14,7 @@
 #include "TCM.h"
 
 #define MAX_LOADSTRING 100
-#define TCM_ABOUT	L"Tablacus ContextMenu 13.11.9 Gaku"
+#define TCM_ABOUT	L"Tablacus Context Menu " _T(STRING(VER_Y)) L"." _T(STRING(VER_M)) L"." _T(STRING(VER_D)) L" Gaku"
 #define TCM_URL		L"http://www.eonet.ne.jp/~gakana/tablacus/"
 // Global variables:
 HINSTANCE hInst;								// current instance
@@ -265,6 +265,15 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd , LPARAM lParam)
 			*((LPBOOL)lParam) = FALSE;
 			return FALSE;
 		}
+		//Dialog(UAC)
+		if (GetWindowLong(hwnd, GWL_EXSTYLE) & WS_EX_TOPMOST) {
+			WCHAR szClass[MAX_CLASS_NAME];
+			GetClassName(hwnd, szClass, MAX_CLASS_NAME);
+			if (lstrcmpi(szClass, L"#32770") == 0) {
+				*((LPBOOL)lParam) = FALSE;
+				return FALSE;
+			}
+		}
 	}
 	return TRUE;
 }
@@ -453,16 +462,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_TIMER:
 		if (wParam == TCMT_CLOSE) {
-			if (g_nCount > 0) {
-				g_nCount--;
-			}
-			else {
-//				if (FindWindow(L"StubWindow32", NULL) == 0) {	//Against property
-				BOOL b = TRUE;
-				EnumWindows(EnumWindowsProc , (LPARAM)&b);
-				if (b) {
-					KillTimer(hWnd, g_uTimerId);
-					DestroyWindow(hWnd);
+			if (GetActiveWindow()) {
+				if (g_nCount > 0) {
+					g_nCount--;
+				}
+				else {
+					BOOL b = TRUE;
+					EnumWindows(EnumWindowsProc , (LPARAM)&b);
+					if (b) {
+						KillTimer(hWnd, g_uTimerId);
+						DestroyWindow(hWnd);
+					}
 				}
 			}
 		}
