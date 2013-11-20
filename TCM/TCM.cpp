@@ -5,7 +5,7 @@
 // Licensed under the MIT License:
 // http://www.opensource.org/licenses/mit-license.php
 //
-// Visual C++ 2008 Express Edition
+// Visual C++ 2008 Express Edition SP1
 // Windows SDK v7.0 
 //
 // http://www.eonet.ne.jp/~gakana/tablacus/
@@ -29,7 +29,7 @@ CtcmContextMenu *g_pCCM = NULL;
 static UINT_PTR g_uTimerId = 0;
 static UINT_PTR g_uTimerId2 = 0;
 RECT g_rc;
-int g_nCount = 0;
+int g_nCount = 1;
 BSTR g_bsInvoke = NULL;
 IDropTarget *g_pDropTarget = NULL;
 DWORD g_grfKeyState = MK_RBUTTON;
@@ -462,7 +462,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_TIMER:
 		if (wParam == TCMT_CLOSE) {
-			if (GetActiveWindow()) {
+			if (GetForegroundWindow()) {
+				ShowWindow(hWnd, SW_HIDE);
 				if (g_nCount > 0) {
 					g_nCount--;
 				}
